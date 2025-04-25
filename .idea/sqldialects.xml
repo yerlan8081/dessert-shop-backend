@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/migrations/000001_create_users_table.down.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/migrations/000001_create_users_table.up.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/migrations/000002_create_categories_table.down.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/migrations/000002_create_categories_table.up.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/migrations/000003_create_desserts_table.down.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/migrations/000003_create_desserts_table.up.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/migrations/000004_create_orders_table.down.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/migrations/000004_create_orders_table.up.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/migrations/000005_create_order_items_table.down.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/migrations/000005_create_order_items_table.up.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/migrations/000006_create_cart_items_table.down.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/migrations/000006_create_cart_items_table.up.sql" dialect="GenericSQL" />
+  </component>
+</project>
