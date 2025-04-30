@@ -21,7 +21,10 @@ func CreateDessert(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, dessert)
+	c.JSON(http.StatusOK, gin.H{
+		"dessert": dessert,
+		"message": "甜品创建成功",
+	})
 }
 
 // 获取所有甜品
@@ -58,6 +61,7 @@ func GetDesserts(c *gin.Context) {
 		"page":     pageInt,
 		"limit":    limitInt,
 		"desserts": desserts,
+		"message":  "甜点",
 	})
 }
 

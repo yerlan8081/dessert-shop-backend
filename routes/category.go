@@ -14,6 +14,7 @@ func CatRoutes(r *gin.Engine) {
 		api.POST("/categories", controllers.CreateCategory)
 		api.GET("/categories", controllers.GetCategories)
 		api.GET("/categories/:id", controllers.GetCategoryWithDesserts)
+		api.PUT("/categories/:id", controllers.UpdateCategory)
 		api.DELETE("/categories/:id", controllers.DeleteCategory)
 	}
 }
