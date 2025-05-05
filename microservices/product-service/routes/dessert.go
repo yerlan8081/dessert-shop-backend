@@ -2,7 +2,7 @@ package routes
 
 import (
 	"dessert-shop-backend/microservices/product-service/controllers"
-	"dessert-shop-backend/microservices/user-service/middleware"
+	"dessert-shop-backend/microservices/product-service/middleware"
 	"github.com/gin-gonic/gin"
 )
 

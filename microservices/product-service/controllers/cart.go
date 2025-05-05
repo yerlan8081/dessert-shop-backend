@@ -1,9 +1,11 @@
 package controllers
 
 import (
+	"dessert-shop-backend/microservices/product-service/database"
 	"dessert-shop-backend/microservices/product-service/models"
-	"dessert-shop-backend/microservices/user-service/database"
+	"errors"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	"net/http"
 )
 
@@ -57,6 +59,68 @@ func GetCart(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"cart": cartItems})
+}
+
+func GetCartItemByID(c *gin.Context) {
+	// 获取 URL 中的 cart item ID
+	id := c.Param("id")
+
+	var cartItem models.CartItem
+	err := database.DB.Preload("Dessert").First(&cartItem, id).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "购物车项不存在"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "查询失败"})
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"cart_item": cartItem})
+}
+
+func UpdateCartItem(c *gin.Context) {
+	id := c.Param("id")
+
+	var input struct {
+		Quantity int `json:"quantity" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
+		return
+	}
+
+	// 获取用户 ID
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "未授权"})
+		return
+	}
+
+	var cartItem models.CartItem
+	err := database.DB.First(&cartItem, id).Error
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "购物车项不存在"})
+		return
+	}
+
+	// 确保该购物车项属于当前用户
+	if cartItem.UserID != userID.(uint) {
+		c.JSON(http.StatusForbidden, gin.H{"error": "无权限修改该购物车项"})
+		return
+	}
+
+	// 更新数量
+	cartItem.Quantity = input.Quantity
+	if err := database.DB.Save(&cartItem).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "更新失败"})
+		return
+	}
+
+	// 加载关联的 Dessert 信息
+	database.DB.Preload("Dessert").First(&cartItem, cartItem.ID)
+
+	c.JSON(http.StatusOK, gin.H{"message": "购物车项已更新", "item": cartItem})
 }
 
 // 从购物车中删除一项
