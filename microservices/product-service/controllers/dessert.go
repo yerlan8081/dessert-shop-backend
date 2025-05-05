@@ -1,8 +1,8 @@
 package controllers
 
 import (
+	"dessert-shop-backend/microservices/product-service/database"
 	"dessert-shop-backend/microservices/product-service/models"
-	"dessert-shop-backend/microservices/user-service/database"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"

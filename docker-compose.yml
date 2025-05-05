@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    container_name: dessert-shop-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 20021512
+      POSTGRES_DB: dessert_shop
+
+#    volumes:
+#      - ./app/microservices/user-service/migrations/000001_create_users_table.up.sql:/docker-entrypoint-initdb.d/init.sql
+#      - ./app/microservices/user-service/migrations/000001_create_users_table.down.sql:/docker-entrypoint-initdb.d/init.sql
+#      - ./app/microservices/user-service/migrations/000002_create_categories_table.up.sql:/docker-entrypoint-initdb.d/init.sql
+#      - ./app/microservices/user-service/migrations/000002_create_categories_table.down.sql:/docker-entrypoint-initdb.d/init.sql
+#      - ./app/microservices/user-service/migrations/000003_create_desserts_table.up.sql:/docker-entrypoint-initdb.d/init.sql
+#      - ./app/microservices/user-service/migrations/000003_create_desserts_table.down.sql:/docker-entrypoint-initdb.d/init.sql
+#      - ./app/microservices/user-service/migrations/000004_create_orders_table.up.sql:/docker-entrypoint-initdb.d/init.sql
+#      - ./app/microservices/user-service/migrations/000004_create_orders_table.down.sql:/docker-entrypoint-initdb.d/init.sql
+#      - ./app/microservices/user-service/migrations/000005_create_order_items_table.up.sql:/docker-entrypoint-initdb.d/init.sql
+#      - ./app/microservices/user-service/migrations/000005_create_order_items_table.down.sql:/docker-entrypoint-initdb.d/init.sql
+#      - ./app/microservices/user-service/migrations/000006_create_cart_items_table.up.sql:/docker-entrypoint-initdb.d/init.sql
+#      - ./app/microservices/user-service/migrations/000006_create_cart_items_table.down.sql:/docker-entrypoint-initdb.d/init.sql
+
+    ports:
+      - "5432:5432"
+    networks:
+      - shopnet
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  user-service:
+    build:
+      context: .
+      dockerfile: microservices/user-service/Dockerfile
+    ports:
+      - "8081:8081"
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_USER: postgres
+      DB_PASSWORD: 20021512
+      DB_NAME: dessert_shop
+    networks:
+      - shopnet
+    volumes:
+      - ./user-service/migrations:/app/db/migrations
+
+  product-service:
+    build:
+      context: .
+      dockerfile: microservices/product-service/Dockerfile
+    ports:
+      - "8082:8082"
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_USER: postgres
+      DB_PASSWORD: 20021512
+      DB_NAME: dessert_shop
+    networks:
+      - shopnet
+    volumes:
+      - ./product-service/migrations:/app/db/migrations
+
+networks:
+  shopnet:
+    driver: bridge
+volumes:
+  postgres_data:

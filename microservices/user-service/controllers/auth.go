@@ -5,7 +5,6 @@ import (
 	"dessert-shop-backend/microservices/user-service/models"
 	"dessert-shop-backend/microservices/user-service/utils"
 	"github.com/gin-gonic/gin"
-	"github.com/go-resty/resty/v2"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 )
@@ -72,24 +71,60 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	// 5. 使用 Resty 获取甜点数据
-	client := resty.New()
-	productResp, err := client.R().
-		SetHeader("Content-Type", "application/json").
-		SetHeader("Authorization", "Bearer "+token). // 添加这行
-		Get("http://localhost:8082/api/desserts")
+	c.JSON(http.StatusOK, gin.H{
+		"token": token,
+	})
 
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "获取甜点数据失败"})
+	// 5. 使用 Resty 获取甜点数据
+	//client := resty.New()
+	//productResp, err := client.R().
+	//	SetHeader("Content-Type", "application/json").
+	//	SetHeader("Authorization", "Bearer "+token). // 添加这行
+	//	Get("http://product-service:8082/api/desserts")
+	//
+	//if err != nil {
+	//	c.JSON(http.StatusInternalServerError, gin.H{"error": "获取甜点数据失败"})
+	//	return
+	//}
+
+	// 6. 返回登录信息和甜点数据
+	//c.JSON(http.StatusOK, gin.H{
+	//	"token":    token,
+	//	"user_id":  user.ID,
+	//	"username": user.Username,
+	//	"role":     user.Role,
+	//	"products": productResp.String(), // 你可以根据需要解析为结构体
+	//})
+}
+
+func UpdateUser(c *gin.Context) {
+	var user models.User
+	id := c.Param("id")
+
+	// 查找用户
+	if err := database.DB.First(&user, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "用户未找到"})
 		return
 	}
 
-	// 6. 返回登录信息和甜点数据
-	c.JSON(http.StatusOK, gin.H{
-		"token":    token,
-		"user_id":  user.ID,
-		"username": user.Username,
-		"role":     user.Role,
-		"products": productResp.String(), // 你可以根据需要解析为结构体
-	})
+	// 绑定 JSON 到 user（覆盖原字段）
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// 如果有密码，进行加密
+	if user.Password != "" {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "密码加密失败"})
+			return
+		}
+		user.Password = string(hashedPassword)
+	}
+
+	// 保存更新
+	database.DB.Save(&user)
+
+	c.JSON(http.StatusOK, user)
 }
