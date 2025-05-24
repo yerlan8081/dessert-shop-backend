@@ -4,5 +4,6 @@ CREATE TABLE cart_items (
                             dessert_id INT REFERENCES desserts(id),
                             quantity INT NOT NULL,
                             created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-                            updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+                            updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+                            deleted_at    TIMESTAMP
 );

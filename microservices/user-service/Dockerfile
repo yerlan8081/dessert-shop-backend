@@ -1,23 +1,24 @@
-# 选择官方 Go 镜像作为构建阶段
-FROM golang:1.23-alpine AS builder
+# —— 构建阶段 ——
+FROM golang:1.23-alpine AS builder-user
+WORKDIR /src
 
-WORKDIR /app
-
+# 1. 拷贝根目录 go.mod/go.sum
 COPY go.mod go.sum ./
 RUN go mod download
 
-COPY . .
-RUN chmod +x wait-for-it.sh
+# 2. 拷贝整个 microservices 目录
+COPY microservices ./microservices
 
-# 编译为静态二进制文件
-RUN go build -o user-service ./microservices/user-service/main.go
+# 3. 编译 user-service
+WORKDIR /src/microservices/user-service
+RUN CGO_ENABLED=0 GOOS=linux go build -o user-service
 
-# 运行阶段
-FROM alpine:latest
-WORKDIR /root/
+# —— 运行阶段 ——
+FROM alpine:3.18
+WORKDIR /app
 
-COPY --from=builder /app/user-service .
+COPY --from=builder-user /src/microservices/user-service/user-service ./user-service
+RUN chmod +x ./user-service
 
 EXPOSE 8081
-
-CMD ["./wait-for-it.sh", "db:5432", "--", "./user-service"]
+ENTRYPOINT ["./user-service"]

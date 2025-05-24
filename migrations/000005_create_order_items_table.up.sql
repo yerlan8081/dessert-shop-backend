@@ -5,5 +5,6 @@ CREATE TABLE order_items (
                              quantity INT NOT NULL,
                              price DECIMAL(10, 2) NOT NULL,
                              created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-                             updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+                             updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+                             deleted_at    TIMESTAMP
 );

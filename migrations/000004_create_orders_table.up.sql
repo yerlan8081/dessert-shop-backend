@@ -4,5 +4,6 @@ CREATE TABLE orders (
                         total DECIMAL(10, 2) NOT NULL,
                         status VARCHAR(50) DEFAULT 'pending',
                         created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-                        updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+                        updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+                        deleted_at    TIMESTAMP
 );
